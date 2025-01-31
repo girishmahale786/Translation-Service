@@ -1,17 +1,23 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+api_key = os.getenv("GOOGLE_API_KEY")
 
 # Configure API key and model
-genai.configure(api_key="")
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Initialize FastAPI app
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Home Route
 @app.get("/", response_class=HTMLResponse)
