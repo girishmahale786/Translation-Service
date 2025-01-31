@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+        <h2 class="text-2xl font-semibold mb-6 text-center">Translation Service</h2>
+
+        <!-- Form for Input -->
+        <form id="translationForm">
+            <!-- Input Text -->
+            <div class="mb-4">
+                <label for="textToTranslate" class="block text-gray-700">Text to translate</label>
+                <textarea id="textToTranslate"
+                    class="w-full p-2 border rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter text here..."></textarea>
+            </div>
+
+            <!-- Languages -->
+            <div class="mb-4">
+                <label for="languages" class="block text-gray-700">Source Language</label>
+                <input type="text" id="sourceLanguage"
+                    class="w-full p-2 border rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., es, fr, de">
+            </div>
+
+            <div class="mb-4">
+                <label for="languages" class="block text-gray-700">Destination Language</label>
+                <input type="text" id="destinationLanguage"
+                    class="w-full p-2 border rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., es, fr, de">
+            </div>
+
+            <!-- Translate Button -->
+            <button type="button" id="translateButton"
+                class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition mb-6">
+                Translate
+            </button>
+        </form>
+
+        <!-- Result Section -->
+        <div>
+            <label for="translationResult" class="block text-gray-700">Translation Result</label>
+            <textarea id="translationResult"
+                class="w-full p-2 border rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Translated text will appear here..." readonly></textarea>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById("translateButton").addEventListener("click", async () => {
+            // Get input values
+            const text = document.getElementById("textToTranslate").value;
+            const destinationLanguage = document.getElementById("destinationLanguage").value;
+            const sourceLanguage = document.getElementById("sourceLanguage").value;
+
+            // Send request to FastAPI
+            try {
+                const response = await fetch("/api/translate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        source: sourceLanguage,
+                        target: destinationLanguage
+                    })
+                });
+
+                // Parse and display the response
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById("translationResult").value = data.translation;
+                } else {
+                    alert("Failed to translate. Please check input.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again later.");
+            }
+        });
+    </script>
+</body>
+
+</html>
